@@ -7,6 +7,8 @@ import { ethers } from "ethers";
 import copy from "copy-to-clipboard";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
+import { useRecoilState } from "recoil";
+import { walletState } from "../recoil/atoms";
 
 export default function CreateWallet() {
   const [password, setPassword] = useState("");
@@ -16,6 +18,7 @@ export default function CreateWallet() {
   const [isLoading, setIsLoading] = useState(false);
   const [isGenerated, setIsGenerated] = useState(false);
   const [title, setTitle] = useState("Create a New Wallet");
+  const [updateWalletState, setUpdateWalletState] = useRecoilState(walletState);
 
   const saveKeystore = () => {
     let textToSaveAsBlob = new Blob([keystore], { type: "text/plain" });
@@ -67,6 +70,7 @@ export default function CreateWallet() {
         setKeystore(encryptedWallet);
         setIsGenerated(true);
         setTitle("Wallet Successfully Created");
+        setUpdateWalletState("Created");
         setMsg(wallet.mnemonic.phrase);
         localStorage.setItem("JSON", encryptedWallet);
       }
