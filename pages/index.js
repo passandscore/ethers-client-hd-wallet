@@ -14,7 +14,10 @@ export default function Home() {
 
         <main className={styles.main}>
           <div className="mb-5 pb-5">
-            <h1 className="display-1 pb-5" style={{ color: "#72C1EA" }}>
+            <h1
+              className="display-1 pb-5 text-center"
+              style={{ color: "#72C1EA" }}
+            >
               Simple HD Wallet using{" "}
               <a
                 href="https://docs.ethers.io/v5/"

@@ -18,6 +18,11 @@ export default function ShowMnemonic() {
   const [title, setTitle] = useState("Show Mnemonic Phrase");
 
   const showMnemonic = async () => {
+    if (!password) {
+      toast.error("Password Required", { theme: "colored" });
+      return;
+    }
+
     const providedPassword = password;
 
     let wallet;
@@ -26,7 +31,10 @@ export default function ShowMnemonic() {
       wallet = await ethers.Wallet.fromEncryptedJson(
         keystore,
         providedPassword,
-        setIsLoading(true)
+        () => {
+          setIsLoading(true);
+          setTitle("Decrypting Wallet...");
+        }
       );
 
       if (wallet) {

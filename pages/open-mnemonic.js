@@ -7,6 +7,8 @@ import { ethers } from "ethers";
 import "react-toastify/dist/ReactToastify.min.css";
 import { useRecoilState } from "recoil";
 import { walletState } from "../recoil/atoms";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.min.css";
 
 export default function OpenMnemonic() {
   const [password, setPassword] = useState("");
@@ -19,6 +21,10 @@ export default function OpenMnemonic() {
   const [updateWalletState, setUpdateWalletState] = useRecoilState(walletState);
 
   const openWalletFromMnemonic = async () => {
+    if (!password) {
+      toast.error("Password Required", { theme: "colored" });
+      return;
+    }
     const providedMnemonic = mnemonic;
 
     try {
@@ -27,11 +33,10 @@ export default function OpenMnemonic() {
 
       const wallet = ethers.Wallet.fromMnemonic(providedMnemonic);
       const providedPassword = password;
-      const encryptedWallet = await wallet.encrypt(
-        providedPassword,
-        {},
-        setIsLoading(true)
-      );
+      const encryptedWallet = await wallet.encrypt(providedPassword, {}, () => {
+        setIsLoading(true);
+        setTitle("Decrypting Wallet...");
+      });
 
       if (!encryptedWallet) throw new Error("Invalid Password");
 
@@ -53,6 +58,8 @@ export default function OpenMnemonic() {
       <Head>
         <title>Open Mnemonic</title>
       </Head>
+
+      <ToastContainer position="top-center" pauseOnFocusLoss={false} />
 
       {!errorMsg ? (
         <div className={styles.container}>
@@ -110,7 +117,7 @@ export default function OpenMnemonic() {
                   <input
                     type="text"
                     className="form-control"
-                    placeholder="Provide your wallet password."
+                    placeholder="Provide a secure password."
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />

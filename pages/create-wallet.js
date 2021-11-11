@@ -51,6 +51,11 @@ export default function CreateWallet() {
   };
 
   const handleClick = async () => {
+    if (!password) {
+      toast.error("Password Required", { theme: "colored" });
+      return;
+    }
+
     if (isGenerated) {
       saveKeystore();
       return;
@@ -70,7 +75,7 @@ export default function CreateWallet() {
         setKeystore(encryptedWallet);
         setIsGenerated(true);
         setTitle("Wallet Successfully Created");
-        setUpdateWalletState("Created");
+        setUpdateWalletState(true);
         setMnemonic(wallet.mnemonic.phrase);
         localStorage.setItem("keystore", encryptedWallet);
       }
