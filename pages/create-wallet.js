@@ -1,7 +1,7 @@
 import Head from "next/head";
 import Image from "next/image";
 import { ProgressBar, Button } from "react-bootstrap";
-import styles from "../styles/OpenWallet.module.css";
+import styles from "../styles/CreateWallet.module.css";
 import { useState } from "react";
 import { ethers } from "ethers";
 import copy from "copy-to-clipboard";
@@ -97,42 +97,37 @@ export default function CreateWallet() {
               </div>
             )}
 
-            <h1 className="title display-3" style={{ color: "#72C1EA" }}>
+            <h1 className="title display-3 pb-4" style={{ color: "#72C1EA" }}>
               {title}
             </h1>
             {msg && (
-              <div>
-                <div className="input-group my-3" style={{ width: "725px" }}>
-                  <span className="input-group-text">Mnemonic</span>
-                  <input
-                    type="text"
-                    className="form-control"
-                    aria-label="Amount (to the nearest dollar)"
-                    value={msg}
-                    disabled
-                  />
+              <>
+                <div className="d-flex justified-content-center">
                   <button
-                    type="button"
-                    className="btn btn-light"
-                    data-toggle="tooltip"
-                    data-placement="top"
-                    title="Copy to clipboard"
+                    className=" btn btn-light btn-lg p-3 m-3"
+                    style={{ width: "250px" }}
                     onClick={mnemonicCopiedHandler}
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      className="bi bi-clipboard"
-                      viewBox="0 0 16 16"
-                    >
-                      <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z" />
-                      <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z" />
-                    </svg>
+                    Copy Mnemonic
+                  </button>
+                  <button
+                    className=" btn btn-light btn-lg p-3 m-3"
+                    style={{ width: "250px" }}
+                    onClick={saveKeystore}
+                  >
+                    Download Keystore
                   </button>
                 </div>
-              </div>
+                <ul>
+                  <li className=" py-2" style={{ color: "#F7CD53" }}>
+                    Save your mnemonic phrase and keystore in a safe place.
+                  </li>
+
+                  <li style={{ color: "#F7CD53" }}>
+                    You will need these to restore your wallet.
+                  </li>
+                </ul>
+              </>
             )}
             {isLoading && (
               <div className="flex justify-center mt-20">
@@ -155,20 +150,7 @@ export default function CreateWallet() {
               </div>
             )}
 
-            {isGenerated && (
-              <div className="input-group">
-                <span className="input-group-text">Keystore</span>
-                <textarea
-                  className="form-control"
-                  aria-label="With textarea"
-                  style={{ height: "300px", width: "600px" }}
-                  defaultValue={keystore}
-                  disabled
-                ></textarea>
-              </div>
-            )}
-
-            {!isLoading && (
+            {!isLoading && !isGenerated && (
               <div className="d-grid gap-2">
                 <Button
                   variant="primary"
@@ -177,7 +159,7 @@ export default function CreateWallet() {
                   onClick={handleClick}
                   onChange={(e) => setPassword(e.target.value)}
                 >
-                  {!isGenerated ? "Generate Wallet" : "Save Keystore"}
+                  Generate Wallet
                 </Button>
               </div>
             )}
