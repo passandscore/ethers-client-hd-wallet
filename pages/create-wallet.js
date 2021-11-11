@@ -1,6 +1,6 @@
 import Head from "next/head";
 import Image from "next/image";
-import { ProgressBar, Button } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 import styles from "../styles/CreateWallet.module.css";
 import { useState } from "react";
 import { ethers } from "ethers";
@@ -13,7 +13,7 @@ import { walletState } from "../recoil/atoms";
 export default function CreateWallet() {
   const [password, setPassword] = useState("");
   const [keystore, setKeystore] = useState("");
-  const [msg, setMsg] = useState("");
+  const [mnemonic, setMnemonic] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isGenerated, setIsGenerated] = useState(false);
@@ -42,7 +42,7 @@ export default function CreateWallet() {
 
   const mnemonicCopiedHandler = () => {
     toast.success("Mnemonic Copied to Clipboard", { theme: "colored" });
-    copy(msg);
+    copy(mnemonic);
   };
 
   const walletGenerationProcess = () => {
@@ -71,8 +71,8 @@ export default function CreateWallet() {
         setIsGenerated(true);
         setTitle("Wallet Successfully Created");
         setUpdateWalletState("Created");
-        setMsg(wallet.mnemonic.phrase);
-        localStorage.setItem("JSON", encryptedWallet);
+        setMnemonic(wallet.mnemonic.phrase);
+        localStorage.setItem("keystore", encryptedWallet);
       }
     } catch (err) {
       setErrorMsg(err);
@@ -84,7 +84,7 @@ export default function CreateWallet() {
   return (
     <>
       <Head>
-        <title>Open Wallet</title>
+        <title>Create Wallet</title>
       </Head>
 
       {!errorMsg ? (
@@ -100,7 +100,7 @@ export default function CreateWallet() {
             <h1 className="title display-3 pb-4" style={{ color: "#72C1EA" }}>
               {title}
             </h1>
-            {msg && (
+            {mnemonic && (
               <>
                 <div className="d-flex justified-content-center">
                   <button
@@ -146,6 +146,7 @@ export default function CreateWallet() {
                   type="text"
                   className="form-control"
                   placeholder="Provide a secure password."
+                  onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
             )}
@@ -156,8 +157,8 @@ export default function CreateWallet() {
                   variant="primary"
                   className="mt-3"
                   size="lg"
+                  value={password}
                   onClick={handleClick}
-                  onChange={(e) => setPassword(e.target.value)}
                 >
                   Generate Wallet
                 </Button>
@@ -171,7 +172,9 @@ export default function CreateWallet() {
             <h1 className="title display-3 mb-3" style={{ color: "#72C1EA" }}>
               Unexpected Error
             </h1>
-            <p style={{ color: "#EC6956" }}>{errorMsg}</p>
+            <p className="display-6" style={{ color: "#EC6956" }}>
+              {errorMsg}
+            </p>
           </main>
         </div>
       )}
