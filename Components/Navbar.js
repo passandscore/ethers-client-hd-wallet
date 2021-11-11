@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { useRecoilValue } from "recoil";
-import { walletState } from "../Recoil/atoms";
+import { lockState } from "../Recoil/atoms";
 
 const Navbar = () => {
-  const currentWalletState = useRecoilValue(walletState);
+  const currentWalletLockState = useRecoilValue(lockState);
 
   return (
     <>
@@ -13,7 +13,7 @@ const Navbar = () => {
             <a className="nav-link active fs-5">Home</a>
           </Link>
 
-          {currentWalletState ? (
+          {currentWalletLockState == "unlocked" ? (
             <>
               <Link href="/show-mnemonic">
                 <a className="nav-link fs-5">Show Mnemonic</a>

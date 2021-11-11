@@ -11,12 +11,12 @@ import { INFURA_PROJECT_ID } from "../config";
 
 export default function ViewAddresses() {
   const [password, setPassword] = useState("");
-  const [keystore, setKeystore] = useState(localStorage.getItem("keystore"));
+  const [keystore, setKeystore] = useState(null);
   const [mnemonic, setMnemonic] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isGenerated, setIsGenerated] = useState(false);
-  const [title, setTitle] = useState("Show Addresses and Balances");
+  const [title, setTitle] = useState("Addresses and Balances");
   const [addresses, setAddresses] = useState(null);
   const network = "ropsten";
 
@@ -26,6 +26,10 @@ export default function ViewAddresses() {
 
   const derivationPath = "m/44'/60'/0'/0/";
 
+  useEffect(() => {
+    setKeystore(localStorage.getItem("keystore"));
+  }, []);
+
   const showAddressesAndBalances = async () => {
     let providedPassword = password;
 
@@ -34,7 +38,10 @@ export default function ViewAddresses() {
       wallet = await ethers.Wallet.fromEncryptedJson(
         keystore,
         providedPassword,
-        setIsLoading(true)
+        () => {
+          setIsLoading(true);
+          setTitle("Decrypting Wallet...");
+        }
       );
 
       if (wallet) {
@@ -47,6 +54,7 @@ export default function ViewAddresses() {
           throw Error("No addresses found");
         }
         setIsGenerated(true);
+        setTitle("Addresses & Balances");
       } else {
         throw Error("Wallet not found");
       }
@@ -132,7 +140,11 @@ export default function ViewAddresses() {
 
             <h1
               className="title display-3 pb-4 text-center"
-              style={{ color: "#72C1EA" }}
+              style={{
+                color: "#72C1EA",
+                paddingLeft: "80px",
+                paddingRight: "80px",
+              }}
             >
               {title}
             </h1>
@@ -179,7 +191,7 @@ export default function ViewAddresses() {
                     style={{ borderRadius: "6px", overflow: "hidden" }}
                   >
                     <thead>
-                      <tr>
+                      <tr className="px-1">
                         <th scope="col">#</th>
                         <th scope="col">Address</th>
                         <th scope="col">Balance</th>

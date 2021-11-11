@@ -1,24 +1,29 @@
 import Head from "next/head";
 import Image from "next/image";
+import { useRouter } from "next/router";
+
 import { Button } from "react-bootstrap";
 import styles from "../styles/CreateWallet.module.css";
 import { useState } from "react";
 import { ethers } from "ethers";
 import "react-toastify/dist/ReactToastify.min.css";
 import { useRecoilState } from "recoil";
-import { walletState } from "../recoil/atoms";
+import { lockState } from "../recoil/atoms";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
 
 export default function OpenKeystore() {
   const [password, setPassword] = useState("");
-  const [keystore, setKeystore] = useState(localStorage.getItem("keystore"));
-  const [mnemonic, setMnemonic] = useState("");
+  const [keystore, setKeystore] = useState(null);
   const [errorMsg, setErrorMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isGenerated, setIsGenerated] = useState(false);
   const [title, setTitle] = useState("Open From Keystore File");
-  const [updateWalletState, setUpdateWalletState] = useRecoilState(walletState);
+
+  const [updateWalletLockState, setUpdateWalletLockState] =
+    useRecoilState(lockState);
+
+  const router = useRouter();
 
   const handleOnChange = (e) => {
     setKeystore(e.target.files[0]);
@@ -43,14 +48,14 @@ export default function OpenKeystore() {
       try {
         wallet = await ethers.Wallet.fromEncryptedJson(json, password, () => {
           setIsLoading(true);
-          setTitle("Loading Wallet...");
+          setTitle("Decrypting Wallet...");
         });
 
         if (!wallet.mnemonic.phrase)
           throw Error("Invalid Password or Keystore File");
 
         setIsGenerated(true);
-        setUpdateWalletState(true);
+        setUpdateWalletLockState("unlocked");
         setTitle("Wallet successfully loaded!");
         setIsLoading(false);
 
@@ -153,6 +158,14 @@ export default function OpenKeystore() {
             <p className="display-6" style={{ color: "#EC6956" }}>
               {errorMsg}
             </p>
+            <Button
+              variant="primary"
+              className="mt-3"
+              size="lg"
+              onClick={() => router.reload(window.location.pathname)}
+            >
+              Try Agian
+            </Button>
           </main>
         </div>
       )}

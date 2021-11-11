@@ -1,12 +1,14 @@
 import Head from "next/head";
 import Image from "next/image";
+import { useRouter } from "next/router";
+
 import { Button } from "react-bootstrap";
 import styles from "../styles/CreateWallet.module.css";
 import { useState } from "react";
 import { ethers } from "ethers";
 import "react-toastify/dist/ReactToastify.min.css";
 import { useRecoilState } from "recoil";
-import { walletState } from "../recoil/atoms";
+import { lockState } from "../recoil/atoms";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
 
@@ -18,7 +20,10 @@ export default function OpenMnemonic() {
   const [isLoading, setIsLoading] = useState(false);
   const [isGenerated, setIsGenerated] = useState(false);
   const [title, setTitle] = useState("Open From Mnemonic");
-  const [updateWalletState, setUpdateWalletState] = useRecoilState(walletState);
+  const [updateWalletLockState, setUpdateWalletLockState] =
+    useRecoilState(lockState);
+
+  const router = useRouter();
 
   const openWalletFromMnemonic = async () => {
     if (!password) {
@@ -43,7 +48,7 @@ export default function OpenMnemonic() {
       setKeystore(encryptedWallet);
       localStorage.setItem("keystore", encryptedWallet);
       setIsGenerated(true);
-      setUpdateWalletState(true);
+      setUpdateWalletLockState("unlocked");
 
       setTitle("Wallet successfully loaded!");
     } catch (err) {
@@ -74,11 +79,13 @@ export default function OpenMnemonic() {
               {title}
             </h1>
 
-            {!isGenerated ? (
+            {!isGenerated && !isLoading && (
               <div className=" pb-4 fs-3" style={{ color: "#F7CD53" }}>
                 {mnemonic}
               </div>
-            ) : (
+            )}
+
+            {isGenerated && (
               <div className="flex justify-center pt-4">
                 <Image
                   src={"/wallet.png"}
@@ -146,6 +153,14 @@ export default function OpenMnemonic() {
             <p className="display-6" style={{ color: "#EC6956" }}>
               {errorMsg}
             </p>
+            <Button
+              variant="primary"
+              className="mt-3"
+              size="lg"
+              onClick={() => router.reload(window.location.pathname)}
+            >
+              Try Agian
+            </Button>
           </main>
         </div>
       )}
