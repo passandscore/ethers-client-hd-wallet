@@ -128,7 +128,7 @@ export default function ShowMnemonic() {
                   <input
                     type="text"
                     className="form-control"
-                    placeholder="Provide a secure password."
+                    placeholder="Provide your wallet password."
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />

@@ -60,12 +60,18 @@
 .description a {
   color: #0070f3;
 }
-
+/* 
 .description a:hover,
 .description a:focus,
 .description a:active {
   text-decoration: underline;
 }
+
+.ethers:hover,
+.ethers:focus,
+.ethers:active {
+  text-decoration: underline;
+} */
 
 .code {
   background: #fafafa;
