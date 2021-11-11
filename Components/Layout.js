@@ -5,10 +5,10 @@ import Image from "next/image";
 
 const Layout = ({ children }) => {
   return (
-    <div className="main-container .bgImage">
+    <>
       <Navbar />
-      {children}
-    </div>
+      <div className="d-flex justify-content-center">{children}</div>
+    </>
   );
 };
 
