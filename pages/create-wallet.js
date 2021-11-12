@@ -9,7 +9,12 @@ import copy from "copy-to-clipboard";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
 import { useRecoilState } from "recoil";
-import { lockState, storedAccounts, storedWallet } from "../recoil/atoms";
+import {
+  lockState,
+  storedAccounts,
+  storedWallet,
+  allWallets,
+} from "../recoil/atoms";
 import { NETWORK, INFURA_PROJECT_ID } from "../config";
 import updateAddressBalances from "../utils/updateAddressBalances";
 
@@ -27,6 +32,7 @@ export default function CreateWallet() {
     useRecoilState(storedWallet);
   const [updateStoredAccounts, setUpdateStoredAccounts] =
     useRecoilState(storedAccounts);
+  const [updateAllWallets, setUpdateAllWallets] = useRecoilState(allWallets);
 
   const provider = new ethers.providers.JsonRpcProvider(
     `https://${NETWORK}.infura.io/v3/${INFURA_PROJECT_ID}`
@@ -84,24 +90,22 @@ export default function CreateWallet() {
       );
 
       if (encryptedWallet) {
-        const addresses = await updateAddressBalances(
-          provider,
-          wallet,
-          NETWORK
-        );
+        const user = await updateAddressBalances(provider, wallet, NETWORK);
 
-        if (addresses.length > 0) {
+        if (user.addresses.length > 0) {
           toast.success("5 Accounts Successfully Loaded", { theme: "colored" });
 
           setKeystore(encryptedWallet);
           setMnemonic(wallet.mnemonic.phrase);
           setIsGenerated(true);
-          setUpdateStoredAccounts(addresses);
+          setUpdateAllWallets(user);
+          setUpdateStoredAccounts(user.addresses);
           setUpdateStoredWallet(wallet);
           setUpdateWalletLockState("unlocked");
 
           setTitle("Wallet successfully loaded!");
           localStorage.setItem("keystore", encryptedWallet);
+          console.log(allWallets);
         }
       }
     } catch (err) {

@@ -5,15 +5,18 @@ import copy from "copy-to-clipboard";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
 import { useRecoilValue } from "recoil";
-import { storedAccounts } from "../Recoil/atoms";
+import { allWallets, storedAccounts } from "../Recoil/atoms";
 
 export default function ViewAddresses() {
   const [errorMsg, setErrorMsg] = useState("");
   const [keystore, setKeystore] = useState(null);
-  const currentAddresses = useRecoilValue(storedAccounts);
+  const { addresses } = useRecoilValue(allWallets);
+  const [allAddresses, setAllAddresses] = useState([]);
 
   useEffect(() => {
     setKeystore(localStorage.getItem("keystore"));
+    // setAllAddresses(Object.entries(addresses));
+    console.log(addresses);
   }, []);
 
   const addressCopiedHandler = (e) => {
@@ -30,7 +33,7 @@ export default function ViewAddresses() {
       {!errorMsg ? (
         <div className={styles.container}>
           <ToastContainer position="top-center" pauseOnFocusLoss={false} />
-          <main className={styles.main}>
+          <main className={styles.main} style={{ marginTop: "100px" }}>
             {errorMsg && (
               <div>
                 <p style={{ color: "#EC6956" }}>{errorMsg}</p>
@@ -47,77 +50,49 @@ export default function ViewAddresses() {
             >
               Addresses &amp; Balances
             </h1>
-            <>
-              <table
-                className="table table-hover table-secondary "
-                style={{ borderRadius: "6px", overflow: "hidden" }}
-              >
-                <thead>
-                  <tr className="px-1">
-                    <th scope="col" className="fs-5">
-                      #
-                    </th>
-                    <th scope="col" className="fs-5">
-                      Address
-                    </th>
-                    <th scope="col" className="fs-5">
-                      Balance
-                    </th>
-                    <th scope="col"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {currentAddresses &&
-                    currentAddresses.map(
-                      ({ address, balance, link }, index) => (
-                        <>
-                          <tr
-                            className="table-light"
-                            style={{ paddingTop: "10px" }}
+
+            <div
+              className=" pb-4 text-center display-5"
+              style={{ color: "#F7CD53" }}
+            >
+              {addresses.total} ETH
+            </div>
+
+            {addresses.length != 0 &&
+              addresses.map(({ address, balance, link }, index) => (
+                <div className="w-75 h-100" key={index}>
+                  <div className=" d-flex justify-content-between  bg-white rounded my-2">
+                    <div className="card-body d-flex justify-content-between align-items-center">
+                      <div>
+                        <h5 className="card-title">{balance} ETH</h5>
+                        <p className="card-text">{address}</p>
+                      </div>
+                      <div>
+                        <div>
+                          <a
+                            href={link}
+                            className="btn btn-primary btn-sm w-100"
+                            target="_blank"
+                            rel="noreferrer"
                           >
-                            <th scope="row" className="fs-5">
-                              {index + 1}
-                            </th>
-                            <td className="fs-5">
-                              <a href={link} target="_blank" rel="noreferrer">
-                                {address}
-                              </a>
-                            </td>
-                            <td className="fs-5">{balance}</td>
-                            <td>
-                              <div
-                                data-bs-toggle="tooltip"
-                                data-bs-placement="right"
-                                title="Copy Address"
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  width="16"
-                                  height="16"
-                                  fill="currentColor"
-                                  className="bi bi-clipboard"
-                                  viewBox="0 0 16 16"
-                                  cursor="pointer"
-                                  id={address}
-                                  onClick={(e) => {
-                                    addressCopiedHandler(e);
-                                  }}
-                                >
-                                  <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z" />
-                                  <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z" />
-                                </svg>
-                              </div>
-                            </td>
-                          </tr>
-                        </>
-                      )
-                    )}
-                </tbody>
-              </table>
-              <p className="display-4" style={{ color: "#F7CD53" }}>
-                {currentAddresses.total} ETH
-              </p>
-            </>
+                            History
+                          </a>
+                          <div className="my-1"></div>
+                          <a
+                            className="btn btn-primary btn-sm w-100"
+                            id={address}
+                            onClick={(e) => {
+                              addressCopiedHandler(e);
+                            }}
+                          >
+                            Copy
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
           </main>
         </div>
       ) : (

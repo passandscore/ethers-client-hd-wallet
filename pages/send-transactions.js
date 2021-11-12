@@ -74,6 +74,7 @@ export default function SendTransactions() {
       derivedAddresses.push(wallet.address);
       wallets[wallet.address] = wallet;
     }
+    console.log(wallets);
     setAddresses(derivedAddresses);
     setTitle("Send Transaction");
     setUnlockedWallet(true);

@@ -100,7 +100,10 @@ export default function ShowMnemonic() {
             <h1 className="title display-3 pb-4" style={{ color: "#72C1EA" }}>
               {title}
             </h1>
-            <div className=" pb-4 fs-3" style={{ color: "#F7CD53" }}>
+            <div
+              className=" pb-4 fs-3 text-center"
+              style={{ color: "#F7CD53" }}
+            >
               {mnemonic}
             </div>
             {mnemonic && (

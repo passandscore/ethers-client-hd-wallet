@@ -8,7 +8,12 @@ import { useState } from "react";
 import { ethers } from "ethers";
 import "react-toastify/dist/ReactToastify.min.css";
 import { useRecoilState } from "recoil";
-import { lockState, storedAccounts, storedWallet } from "../recoil/atoms";
+import {
+  lockState,
+  storedAccounts,
+  storedWallet,
+  allWallets,
+} from "../recoil/atoms";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
 import { NETWORK, INFURA_PROJECT_ID } from "../config";
@@ -27,6 +32,7 @@ export default function OpenKeystore() {
     useRecoilState(storedWallet);
   const [updateStoredAccounts, setUpdateStoredAccounts] =
     useRecoilState(storedAccounts);
+  const [updateAllWallets, setUpdateAllWallets] = useRecoilState(allWallets);
 
   const provider = new ethers.providers.JsonRpcProvider(
     `https://${NETWORK}.infura.io/v3/${INFURA_PROJECT_ID}`
@@ -63,15 +69,12 @@ export default function OpenKeystore() {
         if (!wallet.mnemonic.phrase)
           throw Error("Invalid Password or Keystore File");
 
-        const addresses = await updateAddressBalances(
-          provider,
-          wallet,
-          NETWORK
-        );
+        const user = await updateAddressBalances(provider, wallet, NETWORK);
 
         toast.success("5 Accounts Successfully Loaded", { theme: "colored" });
         setIsGenerated(true);
-        setUpdateStoredAccounts(addresses);
+        setUpdateAllWallets(user);
+        setUpdateStoredAccounts(user.addresses);
         setUpdateStoredWallet(wallet);
         setUpdateWalletLockState("unlocked");
 

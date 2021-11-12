@@ -8,7 +8,12 @@ import { useState } from "react";
 import { ethers } from "ethers";
 import "react-toastify/dist/ReactToastify.min.css";
 import { useRecoilState } from "recoil";
-import { lockState, storedWallet, storedAccounts } from "../recoil/atoms";
+import {
+  lockState,
+  storedWallet,
+  storedAccounts,
+  allWallets,
+} from "../recoil/atoms";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
 import updateAddressBalances from "../utils/updateAddressBalances";
@@ -28,6 +33,7 @@ export default function OpenMnemonic() {
     useRecoilState(storedWallet);
   const [updateStoredAccounts, setUpdateStoredAccounts] =
     useRecoilState(storedAccounts);
+  const [updateAllWallets, setUpdateAllWallets] = useRecoilState(allWallets);
 
   const provider = new ethers.providers.JsonRpcProvider(
     `https://${NETWORK}.infura.io/v3/${INFURA_PROJECT_ID}`
@@ -66,10 +72,11 @@ export default function OpenMnemonic() {
 
       // update the wallet balance
 
-      const addresses = await updateAddressBalances(provider, wallet, NETWORK);
+      const user = await updateAddressBalances(provider, wallet, NETWORK);
       toast.success("5 Accounts Successfully Loaded", { theme: "colored" });
       setIsGenerated(true);
-      setUpdateStoredAccounts(addresses);
+      setUpdateAllWallets(user);
+      setUpdateStoredAccounts(user.addresses);
       setUpdateStoredWallet(wallet);
       setUpdateWalletLockState("unlocked");
 
@@ -98,12 +105,15 @@ export default function OpenMnemonic() {
               </div>
             )}
 
-            <h1 className="title display-3" style={{ color: "#72C1EA" }}>
+            <h1 className="title display-3 " style={{ color: "#72C1EA" }}>
               {title}
             </h1>
 
             {!isGenerated && !isLoading && (
-              <div className=" pb-4 fs-3" style={{ color: "#F7CD53" }}>
+              <div
+                className=" pb-4 fs-3 text-center"
+                style={{ color: "#F7CD53" }}
+              >
                 {mnemonic}
               </div>
             )}
@@ -147,7 +157,7 @@ export default function OpenMnemonic() {
                   <input
                     type="text"
                     className="form-control"
-                    placeholder="Provide a secure password."
+                    placeholder="Provide a secure password for the keystore file."
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />

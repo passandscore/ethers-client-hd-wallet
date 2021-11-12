@@ -8,6 +8,7 @@ export default async function (provider, wallet, network) {
   const masterNode = ethers.utils.HDNode.fromMnemonic(wallet.mnemonic.phrase);
 
   const balancePromises = [];
+  const derivedWallets = {};
 
   for (let index = 0; index < 5; index++) {
     // Derive from node and build a new wallet from the new private key
@@ -17,6 +18,7 @@ export default async function (provider, wallet, network) {
 
     // Call the balances from each of the newly created wallets
     let wallet = new ethers.Wallet(derivedPrivateKey, provider);
+    derivedWallets[wallet.address] = wallet;
     const promise = wallet.getBalance();
     balancePromises.push(promise);
   }
@@ -48,5 +50,7 @@ export default async function (provider, wallet, network) {
   }
 
   addresses.total = totalBalance;
-  return addresses;
+  const user = { addresses, derivedWallets };
+  console.log(user);
+  return user;
 }
