@@ -9,10 +9,6 @@ const Navbar = () => {
     <>
       <nav className="navbar navbar-light bg-light position-absolute vw-100  ">
         <div className="container-fluid d-flex justify-content-center ">
-          <Link href="/">
-            <a className="nav-link active fs-5">Home</a>
-          </Link>
-
           {currentWalletLockState == "unlocked" ? (
             <>
               <Link href="/show-mnemonic">
@@ -33,6 +29,10 @@ const Navbar = () => {
             </>
           ) : (
             <>
+              <Link href="/">
+                <a className="nav-link active fs-5">Home</a>
+              </Link>
+
               <Link href="/create-wallet">
                 <a className="nav-link active fs-5">Create Wallet</a>
               </Link>

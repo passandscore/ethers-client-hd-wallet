@@ -10,12 +10,16 @@ import "react-toastify/dist/ReactToastify.min.css";
 
 export default function ShowMnemonic() {
   const [password, setPassword] = useState("");
-  const [keystore, setKeystore] = useState(localStorage.getItem("keystore"));
+  const [keystore, setKeystore] = useState(null);
   const [mnemonic, setMnemonic] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isGenerated, setIsGenerated] = useState(false);
   const [title, setTitle] = useState("Show Mnemonic Phrase");
+
+  useEffect(() => {
+    setKeystore(localStorage.getItem("keystore"));
+  }, []);
 
   const showMnemonic = async () => {
     if (!password) {
