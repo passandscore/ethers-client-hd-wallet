@@ -1,11 +1,22 @@
-import { useRecoilState } from "recoil";
-import { lockState } from "../recoil/atoms";
+import { useResetRecoilState } from "recoil";
+import { lockState, storedAccounts, storedWallet } from "../recoil/atoms";
+
 import { useRouter } from "next/router";
 
 const LockWallet = () => {
-  const [updateWalletLockState, setUpdateWalletLockState] =
-    useRecoilState(lockState);
+  const resetLockState = useResetRecoilState(lockState);
+  const resetStoredAccounts = useResetRecoilState(storedAccounts);
+  const resetStoredWallet = useResetRecoilState(storedWallet);
   const router = useRouter();
+
+  const reset = () => {
+    localStorage.clear();
+    resetLockState();
+    resetStoredAccounts();
+    resetStoredWallet();
+
+    router.push("/");
+  };
 
   return (
     <div className="d-flex justify-content-end">
@@ -16,11 +27,7 @@ const LockWallet = () => {
         <button
           type="button"
           className="btn btn-secondary btn-lg"
-          onClick={() => {
-            localStorage.clear();
-            setUpdateWalletLockState("locked");
-            router.push("/");
-          }}
+          onClick={reset}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
