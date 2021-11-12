@@ -68,9 +68,9 @@ export default function OpenMnemonic() {
 
       const addresses = await updateAddressBalances(provider, wallet, NETWORK);
       toast.success("5 Accounts Successfully Loaded", { theme: "colored" });
-      setUpdateStoredAccounts(addresses);
-      console.log(updateStoredAccounts);
       setIsGenerated(true);
+      setUpdateStoredAccounts(addresses);
+      setUpdateStoredWallet(wallet);
       setUpdateWalletLockState("unlocked");
 
       setTitle("Wallet successfully loaded!");

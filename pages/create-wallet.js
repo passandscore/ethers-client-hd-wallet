@@ -9,7 +9,9 @@ import copy from "copy-to-clipboard";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
 import { useRecoilState } from "recoil";
-import { lockState } from "../recoil/atoms";
+import { lockState, storedAccounts, storedWallet } from "../recoil/atoms";
+import { NETWORK, INFURA_PROJECT_ID } from "../config";
+import updateAddressBalances from "../utils/updateAddressBalances";
 
 export default function CreateWallet() {
   const [password, setPassword] = useState("");
@@ -21,6 +23,14 @@ export default function CreateWallet() {
   const [title, setTitle] = useState("Create a New Wallet");
   const [updateWalletLockState, setUpdateWalletLockState] =
     useRecoilState(lockState);
+  const [updateStoredWallet, setUpdateStoredWallet] =
+    useRecoilState(storedWallet);
+  const [updateStoredAccounts, setUpdateStoredAccounts] =
+    useRecoilState(storedAccounts);
+
+  const provider = new ethers.providers.JsonRpcProvider(
+    `https://${NETWORK}.infura.io/v3/${INFURA_PROJECT_ID}`
+  );
 
   const saveKeystore = () => {
     let textToSaveAsBlob = new Blob([keystore], { type: "text/plain" });
@@ -74,12 +84,25 @@ export default function CreateWallet() {
       );
 
       if (encryptedWallet) {
-        setKeystore(encryptedWallet);
-        setIsGenerated(true);
-        setTitle("Wallet Successfully Created");
-        setUpdateWalletLockState("unlocked");
-        setMnemonic(wallet.mnemonic.phrase);
-        localStorage.setItem("keystore", encryptedWallet);
+        const addresses = await updateAddressBalances(
+          provider,
+          wallet,
+          NETWORK
+        );
+
+        if (addresses.length > 0) {
+          toast.success("5 Accounts Successfully Loaded", { theme: "colored" });
+
+          setKeystore(encryptedWallet);
+          setMnemonic(wallet.mnemonic.phrase);
+          setIsGenerated(true);
+          setUpdateStoredAccounts(addresses);
+          setUpdateStoredWallet(wallet);
+          setUpdateWalletLockState("unlocked");
+
+          setTitle("Wallet successfully loaded!");
+          localStorage.setItem("keystore", encryptedWallet);
+        }
       }
     } catch (err) {
       setErrorMsg(err);
