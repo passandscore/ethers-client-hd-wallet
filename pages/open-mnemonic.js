@@ -8,13 +8,15 @@ import { useState } from "react";
 import { ethers } from "ethers";
 import "react-toastify/dist/ReactToastify.min.css";
 import { useRecoilState } from "recoil";
-import { lockState } from "../recoil/atoms";
+import { lockState, storedWallet, storedAccounts } from "../recoil/atoms";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
+import updateAddressBalances from "../utils/updateAddressBalances";
+import { NETWORK, INFURA_PROJECT_ID } from "../config";
 
 export default function OpenMnemonic() {
   const [password, setPassword] = useState("");
-  const [keystore, setKeystore] = useState(localStorage.getItem("keystore"));
+  const [keystore, setKeystore] = useState(null);
   const [mnemonic, setMnemonic] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -22,6 +24,14 @@ export default function OpenMnemonic() {
   const [title, setTitle] = useState("Open From Mnemonic");
   const [updateWalletLockState, setUpdateWalletLockState] =
     useRecoilState(lockState);
+  const [updateStoredWallet, setUpdateStoredWallet] =
+    useRecoilState(storedWallet);
+  const [updateStoredAccounts, setUpdateStoredAccounts] =
+    useRecoilState(storedAccounts);
+
+  const provider = new ethers.providers.JsonRpcProvider(
+    `https://${NETWORK}.infura.io/v3/${INFURA_PROJECT_ID}`
+  );
 
   const router = useRouter();
 
@@ -36,17 +46,30 @@ export default function OpenMnemonic() {
       if (!ethers.utils.isValidMnemonic(mnemonic))
         throw new Error("Invalid Mnemonic");
 
+      setTitle("Generating wallet...");
+      setIsLoading(true);
+
+      // Generate wallet from mnemonic
       const wallet = ethers.Wallet.fromMnemonic(providedMnemonic);
+      setUpdateStoredWallet(wallet);
+
+      // Encrypt wallet
       const providedPassword = password;
       const encryptedWallet = await wallet.encrypt(providedPassword, {}, () => {
-        setIsLoading(true);
-        setTitle("Decrypting Wallet...");
+        setTitle("Restoring wallet...");
       });
 
       if (!encryptedWallet) throw new Error("Invalid Password");
 
       setKeystore(encryptedWallet);
       localStorage.setItem("keystore", encryptedWallet);
+
+      // update the wallet balance
+
+      toast.success("5 Accounts Successfully Loaded", { theme: "colored" });
+      const addresses = await updateAddressBalances(provider, wallet, NETWORK);
+      setUpdateStoredAccounts(addresses);
+      console.log(updateStoredAccounts);
       setIsGenerated(true);
       setUpdateWalletLockState("unlocked");
 

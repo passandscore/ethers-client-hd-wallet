@@ -202,7 +202,10 @@ export default function ViewAddresses() {
                       {addresses &&
                         addresses.map(({ address, balance, link }, index) => (
                           <>
-                            <tr className="table-light">
+                            <tr
+                              className="table-light"
+                              style={{ paddingTop: "10px" }}
+                            >
                               <th scope="row">{index + 1}</th>
                               <td>
                                 <a href={link} target="_blank" rel="noreferrer">
