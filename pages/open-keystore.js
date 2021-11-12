@@ -8,9 +8,11 @@ import { useState } from "react";
 import { ethers } from "ethers";
 import "react-toastify/dist/ReactToastify.min.css";
 import { useRecoilState } from "recoil";
-import { lockState } from "../recoil/atoms";
+import { lockState, storedAccounts, storedWallet } from "../recoil/atoms";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
+import { NETWORK, INFURA_PROJECT_ID } from "../config";
+import updateAddressBalances from "../utils/updateAddressBalances";
 
 export default function OpenKeystore() {
   const [password, setPassword] = useState("");
@@ -19,9 +21,16 @@ export default function OpenKeystore() {
   const [isLoading, setIsLoading] = useState(false);
   const [isGenerated, setIsGenerated] = useState(false);
   const [title, setTitle] = useState("Open From Keystore File");
-
   const [updateWalletLockState, setUpdateWalletLockState] =
     useRecoilState(lockState);
+  const [updateStoredWallet, setUpdateStoredWallet] =
+    useRecoilState(storedWallet);
+  const [updateStoredAccounts, setUpdateStoredAccounts] =
+    useRecoilState(storedAccounts);
+
+  const provider = new ethers.providers.JsonRpcProvider(
+    `https://${NETWORK}.infura.io/v3/${INFURA_PROJECT_ID}`
+  );
 
   const router = useRouter();
 
@@ -48,16 +57,25 @@ export default function OpenKeystore() {
       try {
         wallet = await ethers.Wallet.fromEncryptedJson(json, password, () => {
           setIsLoading(true);
-          setTitle("Decrypting Wallet...");
+          setTitle("Restoring Wallet...");
         });
 
         if (!wallet.mnemonic.phrase)
           throw Error("Invalid Password or Keystore File");
 
+        const addresses = await updateAddressBalances(
+          provider,
+          wallet,
+          NETWORK
+        );
+
+        toast.success("5 Accounts Successfully Loaded", { theme: "colored" });
+        setUpdateStoredAccounts(addresses);
+        console.log(updateStoredAccounts);
         setIsGenerated(true);
         setUpdateWalletLockState("unlocked");
+
         setTitle("Wallet successfully loaded!");
-        setIsLoading(false);
 
         localStorage.setItem("keystore", json);
       } catch (err) {

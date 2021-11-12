@@ -12,5 +12,5 @@ export const storedWallet = atom({
 
 export const storedAccounts = atom({
   key: "storedAccounts",
-  default: [],
+  default: null,
 });
