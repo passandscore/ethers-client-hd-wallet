@@ -1,14 +1,12 @@
 # Ethereum (Ropsten) Client-side Ethers HD Wallet
+
 <!-- [View Website Here](https://king-wiki.herokuapp.com/) -->
 
-
-<!-- <p align=”center”>
-<img src="images/readme-cover.png" alt="Logo" width="800" height="600">
-</p> -->
+<p align=”center”>
+<img src="public/Simple-HD-Wallet.png" alt="Logo" width="800" height="600">
+</p>
 
 <!-- ABOUT THE PROJECT -->
-
-
 
 This is a Hierarchical Deterministic Wallet that represents a large tree of private keys, which can be reproduced from an initial seed. Each node in the tree is represented by an HDNode which can be branched.
 
@@ -29,7 +27,6 @@ This is an implementation of a hierarchical wallet (HD wallet) for Ethereum in J
 - [React Toastify](https://github.com/fkhadra/react-toastify#readme)
 
 <!-- GETTING STARTED -->
-
 
 ---
 
