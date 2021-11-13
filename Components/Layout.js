@@ -3,7 +3,7 @@ import "bootstrap-icons/font/bootstrap-icons.json";
 import Navbar from "./Navbar";
 import LockWallet from "./LockWallet";
 import { useRecoilValue } from "recoil";
-import { lockState } from "../Recoil/atoms";
+import { lockState } from "../recoil/atoms.js";
 
 const Layout = ({ children }) => {
   const currentWalletLockState = useRecoilValue(lockState);

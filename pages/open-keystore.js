@@ -12,7 +12,7 @@ import {
   storedAccounts,
   storedWallet,
   allWallets,
-} from "../recoil/atoms";
+} from "../recoil/atoms.js";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
 import { NETWORK } from "../config";

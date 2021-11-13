@@ -13,7 +13,7 @@ import {
   storedAccounts,
   storedWallet,
   allWallets,
-} from "../recoil/atoms";
+} from "../recoil/atoms.js";
 import { NETWORK } from "../config";
 import updateAddressBalances from "../utils/updateAddressBalances";
 import generateToken from "../utils/generateToken";

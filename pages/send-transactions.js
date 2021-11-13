@@ -10,7 +10,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
 import { NETWORK } from "../config";
 import { useRecoilValue } from "recoil";
-import { storedWallet } from "../recoil/atoms";
+import { storedWallet } from "../recoil/atoms.js";
 export default function SendTransactions() {
   const [keystore, setKeystore] = useState(null);
   const [errorMsg, setErrorMsg] = useState("");

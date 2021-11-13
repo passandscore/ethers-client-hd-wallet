@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { useRecoilValue } from "recoil";
-import { lockState } from "../Recoil/atoms";
+import { lockState } from "../recoil/atoms.js";
 import { exportWallet } from "../utils/exportWallet";
 
 const Navbar = () => {

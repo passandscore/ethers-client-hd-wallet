@@ -1,5 +1,5 @@
 import { useResetRecoilState } from "recoil";
-import { lockState, storedAccounts, storedWallet } from "../recoil/atoms";
+import { lockState, storedAccounts, storedWallet } from "../recoil/atoms.js";
 
 import { useRouter } from "next/router";
 
