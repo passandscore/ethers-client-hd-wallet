@@ -95,7 +95,7 @@ export default function SendTransactions() {
         setSigned(createReceipt);
         toast.success("Transaction successfully signed", {
           theme: "colored",
-          position: toast.POSITION.BOTTOM_RIGHT,
+          position: toast.POSITION.BOTTOM_CENTER,
         });
 
         setIsLoading(false);
@@ -143,7 +143,7 @@ export default function SendTransactions() {
       setTimeout(() => {
         toast.info("Waiting for current block to be mined.", {
           theme: "colored",
-          position: toast.POSITION.BOTTOM_RIGHT,
+          position: toast.POSITION.BOTTOM_CENTER,
         });
       }, 3000);
 
@@ -151,7 +151,7 @@ export default function SendTransactions() {
       setTitle("Transaction Successful!");
       toast.success("Transaction successful", {
         theme: "colored",
-        position: toast.POSITION.BOTTOM_RIGHT,
+        position: toast.POSITION.BOTTOM_CENTER,
       });
 
       setIsLoading(false);

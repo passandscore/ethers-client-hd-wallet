@@ -48,7 +48,7 @@ export default function OpenKeystore() {
     if (!password) {
       toast.error("Password Required", {
         theme: "colored",
-        position: toast.POSITION.BOTTOM_RIGHT,
+        position: toast.POSITION.BOTTOM_CENTER,
       });
       return;
     }
@@ -76,7 +76,7 @@ export default function OpenKeystore() {
 
         toast.success("5 Accounts Successfully Loaded", {
           theme: "colored",
-          position: toast.POSITION.BOTTOM_RIGHT,
+          position: toast.POSITION.BOTTOM_CENTER,
         });
         setIsGenerated(true);
         setUpdateAllWallets(user);
@@ -158,7 +158,7 @@ export default function OpenKeystore() {
                 <div className="input-group my-4">
                   <span className="input-group-text">Password</span>
                   <input
-                    type="text"
+                    type="password"
                     className="form-control"
                     placeholder="Provide your wallet password."
                     value={password}

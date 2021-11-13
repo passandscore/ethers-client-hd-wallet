@@ -60,7 +60,10 @@ export default function ShowMnemonic() {
   };
 
   const mnemonicCopiedHandler = () => {
-    toast.success("Mnemonic Copied to Clipboard", { theme: "colored" });
+    toast.success("Mnemonic Copied to Clipboard", {
+      theme: "colored",
+      position: toast.POSITION.BOTTOM_CENTER,
+    });
     copy(mnemonic);
   };
 

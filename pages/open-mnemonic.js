@@ -45,7 +45,7 @@ export default function OpenMnemonic() {
     if (!password) {
       toast.error("Password Required", {
         theme: "colored",
-        position: toast.POSITION.BOTTOM_RIGHT,
+        position: toast.POSITION.BOTTOM_CENTER,
       });
       return;
     }
@@ -82,7 +82,7 @@ export default function OpenMnemonic() {
       const user = await updateAddressBalances(provider, wallet, NETWORK);
       toast.success("5 Accounts Successfully Loaded", {
         theme: "colored",
-        position: toast.POSITION.BOTTOM_RIGHT,
+        position: toast.POSITION.BOTTOM_CENTER,
       });
       setIsGenerated(true);
       setUpdateAllWallets(user);
@@ -165,7 +165,7 @@ export default function OpenMnemonic() {
                 <div className="input-group my-4">
                   <span className="input-group-text">Password</span>
                   <input
-                    type="text"
+                    type="password"
                     className="form-control"
                     placeholder="Provide a secure password for the keystore file."
                     value={password}

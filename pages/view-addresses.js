@@ -14,11 +14,8 @@ import jwt from "jsonwebtoken";
 
 export default function ViewAddresses() {
   const [errorMsg, setErrorMsg] = useState("");
-  const [keystore, setKeystore] = useState(null);
-  const [password, setPassword] = useState("");
-  const [isLoaded, setisLoaded] = useState(false);
   const [walletIsLoaded, setWalletIsLoaded] = useState(false);
-  const [title, setTitle] = useState("Updating Wallet Balances");
+  const [title, setTitle] = useState("Updating Wallet Balances...");
   const { addresses } = useRecoilValue(allWallets);
 
   const provider = new ethers.providers.JsonRpcProvider(
@@ -32,9 +29,6 @@ export default function ViewAddresses() {
     useRecoilState(storedWallet);
 
   useEffect(() => {
-    setKeystore(localStorage.getItem("keystore"));
-    setPassword(localStorage.getItem("wallet-pw"));
-
     jwt.verify(
       localStorage.getItem("wallet-pw"),
       "jwtSecret",
@@ -64,7 +58,6 @@ export default function ViewAddresses() {
         setUpdateAllWallets(user);
         setUpdateStoredAccounts(user.addresses);
         setTitle(`Addresses / Balances`);
-        setisLoaded(true);
       }
     } catch (err) {
       setErrorMsg(err.message);
@@ -75,7 +68,7 @@ export default function ViewAddresses() {
   const addressCopiedHandler = (e) => {
     toast.success("Address Copied to Clipboard", {
       theme: "colored",
-      position: toast.POSITION.BOTTOM_RIGHT,
+      position: toast.POSITION.BOTTOM_CENTER,
     });
     copy(e.target.id);
   };

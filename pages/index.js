@@ -23,6 +23,8 @@ export default function Home() {
                 href="https://docs.ethers.io/v5/"
                 className="ethers"
                 style={{ color: "#F7CD53" }}
+                target="_blank"
+                rel="noreferrer"
               >
                 Ethers.js!
               </a>
@@ -34,12 +36,26 @@ export default function Home() {
                 <a
                   href="https://en.bitcoin.it/wiki/Deterministic_wallet"
                   style={{ color: "#F7CD53" }}
+                  target="_blank"
+                  rel="noreferrer"
                 >
                   Hierarchical deterministic wallet
                 </a>{" "}
                 kept encrypted in Local Storage.
               </p>
               <p>It shows the first 5 derived addresses and their balances.</p>
+              <p>
+                Configured for the{" "}
+                <a
+                  href="https://ropsten.etherscan.io/"
+                  style={{ color: "#F7CD53" }}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Ropsten
+                </a>{" "}
+                test network.
+              </p>
             </div>
           </div>
         </main>

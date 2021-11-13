@@ -61,7 +61,7 @@ export default function CreateWallet() {
   const mnemonicCopiedHandler = () => {
     toast.success("Mnemonic Copied to Clipboard", {
       theme: "colored",
-      position: toast.POSITION.BOTTOM_RIGHT,
+      position: toast.POSITION.BOTTOM_CENTER,
     });
     copy(mnemonic);
   };
@@ -75,7 +75,7 @@ export default function CreateWallet() {
     if (!password) {
       toast.error("Password Required", {
         theme: "colored",
-        position: toast.POSITION.BOTTOM_RIGHT,
+        position: toast.POSITION.BOTTOM_CENTER,
       });
       return;
     }
@@ -101,7 +101,7 @@ export default function CreateWallet() {
         if (user.addresses.length > 0) {
           toast.success("5 Accounts Successfully Loaded", {
             theme: "colored",
-            position: toast.POSITION.BOTTOM_RIGHT,
+            position: toast.POSITION.BOTTOM_CENTER,
           });
 
           setKeystore(encryptedWallet);
@@ -150,31 +150,35 @@ export default function CreateWallet() {
             </h1>
             {mnemonic && (
               <>
-                <div className="d-flex justified-content-center">
-                  <button
-                    className=" btn btn-light btn-lg p-3 m-3"
-                    style={{ width: "250px" }}
-                    onClick={mnemonicCopiedHandler}
-                  >
-                    Copy Mnemonic
-                  </button>
-                  <button
-                    className=" btn btn-light btn-lg p-3 m-3"
-                    style={{ width: "250px" }}
-                    onClick={saveKeystore}
-                  >
-                    Download Keystore
-                  </button>
-                </div>
-                <ul>
-                  <li className=" py-2" style={{ color: "#F7CD53" }}>
-                    Save your mnemonic phrase and keystore in a safe place.
-                  </li>
+                <div>
+                  <div className="d-flex justified-content-between">
+                    <Button
+                      variant="primary"
+                      className="mt-3 mx-2"
+                      size="lg"
+                      onClick={mnemonicCopiedHandler}
+                    >
+                      Copy Mnemonic
+                    </Button>
+                    <Button
+                      variant="primary"
+                      className="mt-3 mx-3"
+                      size="lg"
+                      onClick={saveKeystore}
+                    >
+                      Download Keystore
+                    </Button>
+                  </div>
+                  <ul>
+                    <li className=" py-2" style={{ color: "#F7CD53" }}>
+                      Save your mnemonic phrase and keystore in a safe place.
+                    </li>
 
-                  <li style={{ color: "#F7CD53" }}>
-                    You will need these to restore your wallet.
-                  </li>
-                </ul>
+                    <li style={{ color: "#F7CD53" }}>
+                      You will need these to restore your wallet.
+                    </li>
+                  </ul>
+                </div>
               </>
             )}
             {isLoading && (
@@ -191,7 +195,7 @@ export default function CreateWallet() {
               <div className="input-group my-4">
                 <span className="input-group-text">Password</span>
                 <input
-                  type="text"
+                  type="password"
                   className="form-control"
                   placeholder="Provide a secure password."
                   onChange={(e) => setPassword(e.target.value)}
