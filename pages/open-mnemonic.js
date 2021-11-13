@@ -1,7 +1,6 @@
 import Head from "next/head";
 import Image from "next/image";
 import { useRouter } from "next/router";
-
 import { Button } from "react-bootstrap";
 import styles from "../styles/CreateWallet.module.css";
 import { useState } from "react";
@@ -18,6 +17,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
 import updateAddressBalances from "../utils/updateAddressBalances";
 import { NETWORK, INFURA_PROJECT_ID } from "../config";
+import generateToken from "../utils/generateToken";
 
 export default function OpenMnemonic() {
   const [password, setPassword] = useState("");
@@ -43,7 +43,10 @@ export default function OpenMnemonic() {
 
   const openWalletFromMnemonic = async () => {
     if (!password) {
-      toast.error("Password Required", { theme: "colored" });
+      toast.error("Password Required", {
+        theme: "colored",
+        position: toast.POSITION.BOTTOM_RIGHT,
+      });
       return;
     }
     const providedMnemonic = mnemonic;
@@ -67,13 +70,20 @@ export default function OpenMnemonic() {
 
       if (!encryptedWallet) throw new Error("Invalid Password");
 
+      // Encrypt the password
+      const encryptedPassword = generateToken(password);
+      localStorage.setItem("wallet-pw", encryptedPassword);
+
       setKeystore(encryptedWallet);
       localStorage.setItem("keystore", encryptedWallet);
 
       // update the wallet balance
 
       const user = await updateAddressBalances(provider, wallet, NETWORK);
-      toast.success("5 Accounts Successfully Loaded", { theme: "colored" });
+      toast.success("5 Accounts Successfully Loaded", {
+        theme: "colored",
+        position: toast.POSITION.BOTTOM_RIGHT,
+      });
       setIsGenerated(true);
       setUpdateAllWallets(user);
       setUpdateStoredAccounts(user.addresses);

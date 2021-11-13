@@ -2,64 +2,42 @@ import Head from "next/head";
 import Image from "next/image";
 import { useRouter } from "next/router";
 
-import { Modal, Button } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 import styles from "../styles/CreateWallet.module.css";
 import { useEffect, useState } from "react";
 import { ethers } from "ethers";
-import copy from "copy-to-clipboard";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
-import { INFURA_PROJECT_ID } from "../config";
-
+import { NETWORK, INFURA_PROJECT_ID } from "../config";
+import { useRecoilValue } from "recoil";
+import { storedWallet } from "../recoil/atoms";
 export default function SendTransactions() {
-  const [password, setPassword] = useState("");
+  // const [password, setPassword] = useState("");
   const [keystore, setKeystore] = useState(null);
-  const [mnemonic, setMnemonic] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isGenerated, setIsGenerated] = useState(false);
   const [title, setTitle] = useState("Send Transaction");
   const [addresses, setAddresses] = useState([]);
-  const [unlockedWallet, setUnlockedWallet] = useState(false);
-  const [isSigned, setIsSigned] = useState(false);
   const [sender, setSender] = useState("");
   const [recipient, setRecipient] = useState("");
   const [amount, setAmount] = useState("");
   const [wallets, setWallets] = useState({});
   const [hash, setHash] = useState("");
   const [etherscanURL, setEtherscanURL] = useState("");
-  const network = "ropsten";
+  const primaryWallet = useRecoilValue(storedWallet);
+
   const provider = new ethers.providers.JsonRpcProvider(
-    `https://${network}.infura.io/v3/${INFURA_PROJECT_ID}`
+    `https://${NETWORK}.infura.io/v3/${INFURA_PROJECT_ID}`
   );
+
   const router = useRouter();
 
   const derivationPath = "m/44'/60'/0'/0/";
 
   useEffect(() => {
     setKeystore(localStorage.getItem("keystore"));
+    renderAddresses(primaryWallet);
   }, []);
-
-  const unlockWalletAndDeriveAddresses = async () => {
-    let wallet;
-
-    try {
-      wallet = await ethers.Wallet.fromEncryptedJson(keystore, password, () => {
-        setIsLoading(true);
-        setTitle("Decrypting Wallet...");
-      });
-    } catch (err) {
-      setErrorMsg(err.message);
-
-      return;
-    } finally {
-      setIsLoading(false);
-    }
-
-    toast.success("Wallet successfully unlocked!", { theme: "colored" });
-
-    renderAddresses(wallet);
-  };
 
   const renderAddresses = async (wallet) => {
     const derivedAddresses = [];
@@ -77,7 +55,6 @@ export default function SendTransactions() {
     console.log(wallets);
     setAddresses(derivedAddresses);
     setTitle("Send Transaction");
-    setUnlockedWallet(true);
     console.log(derivedAddresses);
   };
 
@@ -116,18 +93,28 @@ export default function SendTransactions() {
       setTitle("Processing Transaction...");
       console.log(wallet);
       const createReceipt = await wallet.sendTransaction(tx);
-      setIsSigned(true);
-      toast.success("Transaction successfully signed", { theme: "colored" });
-      toast.info("Waiting for current block to be mined.", {
+      toast.success("Transaction successfully signed", {
         theme: "colored",
+        position: toast.POSITION.BOTTOM_RIGHT,
       });
+
+      setTimeout(() => {
+        toast.info("Waiting for current block to be mined.", {
+          theme: "colored",
+          position: toast.POSITION.BOTTOM_RIGHT,
+        });
+      }, 3000);
 
       await createReceipt.wait();
       setTitle("Transaction Successful!");
-      toast.success("Transaction successfully sent", { theme: "colored" });
+      toast.success("Transaction successful", {
+        theme: "colored",
+        position: toast.POSITION.BOTTOM_RIGHT,
+      });
 
       setIsLoading(false);
       const hash = createReceipt.hash;
+
       console.log(`Transaction successful with hash ${hash}`);
       setTitle("Transaction successful with hash");
       setHash(hash);
@@ -138,7 +125,6 @@ export default function SendTransactions() {
       err.message.includes("insufficient funds")
         ? setErrorMsg("Insufficient Funds")
         : setErrorMsg(err.message);
-      return;
     }
   };
 
@@ -175,7 +161,7 @@ export default function SendTransactions() {
                 />
               </div>
             )}
-            {!unlockedWallet && !isLoading && (
+            {/* {!unlockedWallet && !isLoading && (
               <>
                 <div className="input-group my-4">
                   <span className="input-group-text">Password</span>
@@ -199,9 +185,9 @@ export default function SendTransactions() {
                   </Button>
                 </div>
               </>
-            )}
+            )} */}
 
-            {unlockedWallet && !isLoading && !hash && (
+            {!isLoading && !hash && (
               <>
                 <div className="input-group my-2">
                   <label className="input-group-text" htmlFor="sender">
@@ -216,11 +202,12 @@ export default function SendTransactions() {
                     }}
                   >
                     <option selected>Choose an address</option>
-                    {addresses.map((address, index) => (
-                      <option key={index} value={address}>
-                        {address}
-                      </option>
-                    ))}
+                    {addresses.length > 0 &&
+                      addresses.map((address, index) => (
+                        <option key={index} value={address}>
+                          {address}
+                        </option>
+                      ))}
                   </select>
                 </div>
 

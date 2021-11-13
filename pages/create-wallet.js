@@ -1,6 +1,5 @@
 import Head from "next/head";
 import Image from "next/image";
-
 import { Button } from "react-bootstrap";
 import styles from "../styles/CreateWallet.module.css";
 import { useState } from "react";
@@ -17,6 +16,7 @@ import {
 } from "../recoil/atoms";
 import { NETWORK, INFURA_PROJECT_ID } from "../config";
 import updateAddressBalances from "../utils/updateAddressBalances";
+import generateToken from "../utils/generateToken";
 
 export default function CreateWallet() {
   const [password, setPassword] = useState("");
@@ -59,7 +59,10 @@ export default function CreateWallet() {
   }
 
   const mnemonicCopiedHandler = () => {
-    toast.success("Mnemonic Copied to Clipboard", { theme: "colored" });
+    toast.success("Mnemonic Copied to Clipboard", {
+      theme: "colored",
+      position: toast.POSITION.BOTTOM_RIGHT,
+    });
     copy(mnemonic);
   };
 
@@ -70,7 +73,10 @@ export default function CreateWallet() {
 
   const handleClick = async () => {
     if (!password) {
-      toast.error("Password Required", { theme: "colored" });
+      toast.error("Password Required", {
+        theme: "colored",
+        position: toast.POSITION.BOTTOM_RIGHT,
+      });
       return;
     }
 
@@ -93,7 +99,10 @@ export default function CreateWallet() {
         const user = await updateAddressBalances(provider, wallet, NETWORK);
 
         if (user.addresses.length > 0) {
-          toast.success("5 Accounts Successfully Loaded", { theme: "colored" });
+          toast.success("5 Accounts Successfully Loaded", {
+            theme: "colored",
+            position: toast.POSITION.BOTTOM_RIGHT,
+          });
 
           setKeystore(encryptedWallet);
           setMnemonic(wallet.mnemonic.phrase);
@@ -104,6 +113,11 @@ export default function CreateWallet() {
           setUpdateWalletLockState("unlocked");
 
           setTitle("Wallet successfully loaded!");
+
+          // Encrypt the password
+          const encryptedPassword = generateToken(password);
+          localStorage.setItem("wallet-pw", encryptedPassword);
+
           localStorage.setItem("keystore", encryptedWallet);
           console.log(allWallets);
         }

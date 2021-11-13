@@ -1,10 +1,9 @@
 import Head from "next/head";
 import Image from "next/image";
 import { useRouter } from "next/router";
-
 import { Button } from "react-bootstrap";
 import styles from "../styles/CreateWallet.module.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import "react-toastify/dist/ReactToastify.min.css";
 import { useRecoilState } from "recoil";
@@ -18,6 +17,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
 import { NETWORK, INFURA_PROJECT_ID } from "../config";
 import updateAddressBalances from "../utils/updateAddressBalances";
+import generateToken from "../utils/generateToken";
 
 export default function OpenKeystore() {
   const [password, setPassword] = useState("");
@@ -46,7 +46,10 @@ export default function OpenKeystore() {
 
   const openWalletFromFile = async () => {
     if (!password) {
-      toast.error("Password Required", { theme: "colored" });
+      toast.error("Password Required", {
+        theme: "colored",
+        position: toast.POSITION.BOTTOM_RIGHT,
+      });
       return;
     }
 
@@ -71,7 +74,10 @@ export default function OpenKeystore() {
 
         const user = await updateAddressBalances(provider, wallet, NETWORK);
 
-        toast.success("5 Accounts Successfully Loaded", { theme: "colored" });
+        toast.success("5 Accounts Successfully Loaded", {
+          theme: "colored",
+          position: toast.POSITION.BOTTOM_RIGHT,
+        });
         setIsGenerated(true);
         setUpdateAllWallets(user);
         setUpdateStoredAccounts(user.addresses);
@@ -79,6 +85,10 @@ export default function OpenKeystore() {
         setUpdateWalletLockState("unlocked");
 
         setTitle("Wallet successfully loaded!");
+
+        // Encrypt the password
+        const encryptedPassword = generateToken(password);
+        localStorage.setItem("wallet-pw", encryptedPassword);
 
         localStorage.setItem("keystore", json);
       } catch (err) {
