@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { useRecoilValue } from "recoil";
 import { lockState } from "../Recoil/atoms";
+import { exportWallet } from "../utils/exportWallet";
 
 const Navbar = () => {
   const currentWalletLockState = useRecoilValue(lockState);
@@ -20,12 +21,14 @@ const Navbar = () => {
               <Link href="/send-transactions">
                 <a className="nav-link fs-5">Send Transactions</a>
               </Link>
-              <Link href="/export-wallet">
-                <a className="nav-link fs-5">Export Wallet</a>
-              </Link>
-              <Link href="/contract">
-                <a className="nav-link fs-5">Contract</a>
-              </Link>
+
+              <a
+                className="nav-link fs-5"
+                style={{ cursor: "pointer" }}
+                onClick={exportWallet}
+              >
+                Export Wallet
+              </a>
             </>
           ) : (
             <>
