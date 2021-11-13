@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
-import { NETWORK, INFURA_PROJECT_ID } from "../config";
+import { NETWORK } from "../config";
 import { useRecoilValue } from "recoil";
 import { storedWallet } from "../recoil/atoms";
 export default function SendTransactions() {
@@ -31,7 +31,7 @@ export default function SendTransactions() {
   const handleShow = () => setShow(true);
 
   const provider = new ethers.providers.JsonRpcProvider(
-    `https://${NETWORK}.infura.io/v3/${INFURA_PROJECT_ID}`
+    `https://${NETWORK}.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_PROJECT_ID}`
   );
 
   const router = useRouter();

@@ -32,12 +32,10 @@ This is an implementation of a hierarchical wallet (HD wallet) for Ethereum in J
 
 ## Local Installation
 
-- Requires a config.js file to be created on the root. Provide the follow information
+- Requires a .env.local file to be created on the root. Provide the follow information
 
 ```bash
-export const INFURA_PROJECT_ID = "<PROJECT ID HERE>";
-export const NETWORK = "ropsten";
-export const DERIVATION_PATH = "m/44'/60'/0'/0/";
+NEXT_PUBLIC_INFURA_PROJECT_ID=<PROJECT ID HERE>
 ```
 
 - Load all dependencies

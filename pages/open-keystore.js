@@ -15,7 +15,7 @@ import {
 } from "../recoil/atoms";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
-import { NETWORK, INFURA_PROJECT_ID } from "../config";
+import { NETWORK } from "../config";
 import updateAddressBalances from "../utils/updateAddressBalances";
 import generateToken from "../utils/generateToken";
 
@@ -35,7 +35,7 @@ export default function OpenKeystore() {
   const [updateAllWallets, setUpdateAllWallets] = useRecoilState(allWallets);
 
   const provider = new ethers.providers.JsonRpcProvider(
-    `https://${NETWORK}.infura.io/v3/${INFURA_PROJECT_ID}`
+    `https://${NETWORK}.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_PROJECT_ID}`
   );
 
   const router = useRouter();
