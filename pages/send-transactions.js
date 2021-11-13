@@ -2,7 +2,7 @@ import Head from "next/head";
 import Image from "next/image";
 import { useRouter } from "next/router";
 
-import { Button } from "react-bootstrap";
+import { Modal, Button } from "react-bootstrap";
 import styles from "../styles/CreateWallet.module.css";
 import { useEffect, useState } from "react";
 import { ethers } from "ethers";
@@ -12,7 +12,6 @@ import { NETWORK, INFURA_PROJECT_ID } from "../config";
 import { useRecoilValue } from "recoil";
 import { storedWallet } from "../recoil/atoms";
 export default function SendTransactions() {
-  // const [password, setPassword] = useState("");
   const [keystore, setKeystore] = useState(null);
   const [errorMsg, setErrorMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -25,6 +24,11 @@ export default function SendTransactions() {
   const [hash, setHash] = useState("");
   const [etherscanURL, setEtherscanURL] = useState("");
   const primaryWallet = useRecoilValue(storedWallet);
+  const [show, setShow] = useState(false);
+  const [signed, setSigned] = useState(null);
+
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
 
   const provider = new ethers.providers.JsonRpcProvider(
     `https://${NETWORK}.infura.io/v3/${INFURA_PROJECT_ID}`
@@ -52,10 +56,56 @@ export default function SendTransactions() {
       derivedAddresses.push(wallet.address);
       wallets[wallet.address] = wallet;
     }
-    console.log(wallets);
     setAddresses(derivedAddresses);
     setTitle("Send Transaction");
-    console.log(derivedAddresses);
+  };
+
+  const signTransaction = async () => {
+    let wallet = wallets[sender];
+
+    // Validations
+    if (sender === "Choose an address") {
+      setErrorMsg("Invalid sender address!");
+      return;
+    }
+
+    if (!recipient) {
+      setErrorMsg("Invalid recipient address!");
+      return;
+    }
+
+    if (!amount || amount <= 0) {
+      setErrorMsg("Invalid transfer value!");
+      return;
+    }
+
+    setIsLoading(true);
+
+    // Create Tx Object
+    const tx = {
+      to: recipient,
+      value: ethers.utils.parseEther(amount.toString()),
+    };
+
+    try {
+      // setTitle("Signing Transaction...");
+      const createReceipt = await wallet.signTransaction(tx);
+
+      if (createReceipt) {
+        setSigned(createReceipt);
+        toast.success("Transaction successfully signed", {
+          theme: "colored",
+          position: toast.POSITION.BOTTOM_RIGHT,
+        });
+
+        setIsLoading(false);
+
+        setTitle("");
+      }
+    } catch (err) {
+      console.log(err);
+      setErrorMsg(err.message);
+    }
   };
 
   const sendTransaction = async () => {
@@ -78,10 +128,7 @@ export default function SendTransactions() {
     }
 
     setIsLoading(true);
-
-    console.log(
-      `Attempting to send ${amount} ETH transaction from ${sender} to ${recipient}`
-    );
+    setSigned(null);
 
     // Create Tx Object
     const tx = {
@@ -91,12 +138,7 @@ export default function SendTransactions() {
 
     try {
       setTitle("Processing Transaction...");
-      console.log(wallet);
       const createReceipt = await wallet.sendTransaction(tx);
-      toast.success("Transaction successfully signed", {
-        theme: "colored",
-        position: toast.POSITION.BOTTOM_RIGHT,
-      });
 
       setTimeout(() => {
         toast.info("Waiting for current block to be mined.", {
@@ -115,12 +157,10 @@ export default function SendTransactions() {
       setIsLoading(false);
       const hash = createReceipt.hash;
 
-      console.log(`Transaction successful with hash ${hash}`);
-      setTitle("Transaction successful with hash");
+      setTitle("Transaction successful");
       setHash(hash);
       setEtherscanURL(`https://ropsten.etherscan.io/tx/${hash}`);
     } catch (err) {
-      console.log("error");
       console.log(err);
       err.message.includes("insufficient funds")
         ? setErrorMsg("Insufficient Funds")
@@ -147,9 +187,9 @@ export default function SendTransactions() {
             <h1 className="title display-3 pb-4" style={{ color: "#72C1EA" }}>
               {title}
             </h1>
-            <div className=" pb-4 fs-3" style={{ color: "#F7CD53" }}>
+            {/* <div className=" pb-4 fs-3 text-break" style={{ color: "#F7CD53" }}>
               {hash}
-            </div>
+            </div> */}
 
             {isLoading && (
               <div className="flex justify-center mt-20">
@@ -161,33 +201,8 @@ export default function SendTransactions() {
                 />
               </div>
             )}
-            {/* {!unlockedWallet && !isLoading && (
-              <>
-                <div className="input-group my-4">
-                  <span className="input-group-text">Password</span>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Provide your wallet password."
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                </div>
 
-                <div className="d-grid gap-2">
-                  <Button
-                    variant="primary"
-                    className="mt-3"
-                    size="lg"
-                    onClick={unlockWalletAndDeriveAddresses}
-                  >
-                    Submit
-                  </Button>
-                </div>
-              </>
-            )} */}
-
-            {!isLoading && !hash && (
+            {!isLoading && !signed && !hash && (
               <>
                 <div className="input-group my-2">
                   <label className="input-group-text" htmlFor="sender">
@@ -201,7 +216,7 @@ export default function SendTransactions() {
                       setSender(e.target.value);
                     }}
                   >
-                    <option selected>Choose an address</option>
+                    <option defaultValue>Choose an address</option>
                     {addresses.length > 0 &&
                       addresses.map((address, index) => (
                         <option key={index} value={address}>
@@ -236,27 +251,89 @@ export default function SendTransactions() {
                     variant="primary"
                     className="mt-3"
                     size="lg"
-                    onClick={sendTransaction}
+                    onClick={signTransaction}
                   >
-                    Sign &amp; Send Transaction
+                    Sign Transaction
                   </Button>
                 </div>
               </>
             )}
 
+            {signed && (
+              <>
+                <div className="card p-2">
+                  <div className="card-header fs-3">Transaction Preview</div>
+                  <ul className="list-group list-group-flush">
+                    <li className="list-group-item">
+                      <span className="fw-bold">Sender:</span> {sender}
+                    </li>
+                    <li className="list-group-item">
+                      <span className="fw-bold">Recipient:</span> {recipient}
+                    </li>
+                    <li className="list-group-item">
+                      <span className="fw-bold">Amount:</span> {amount}
+                    </li>
+                  </ul>
+                  <div className="d-flex">
+                    <Button
+                      variant="primary"
+                      className="mt-3 mx-1"
+                      size="lg"
+                      onClick={handleShow}
+                    >
+                      Review Signature
+                    </Button>
+                    <Button
+                      variant="primary"
+                      className="mt-3 "
+                      size="lg"
+                      onClick={sendTransaction}
+                    >
+                      Send Transaction
+                    </Button>
+                    <Button
+                      variant="danger"
+                      className="mt-3 mx-1"
+                      size="lg"
+                      onClick={() => {
+                        setSigned(null);
+                        setTitle("Send Transaction");
+                      }}
+                    >
+                      Decline
+                    </Button>
+                  </div>
+                </div>
+
+                <Modal show={show} onHide={handleClose}>
+                  <Modal.Header closeButton>
+                    <Modal.Title>Transaction Signature</Modal.Title>
+                  </Modal.Header>
+                  <Modal.Body className="text-break">{signed}</Modal.Body>
+                  <Modal.Footer>
+                    <Button variant="secondary" onClick={handleClose}>
+                      Close
+                    </Button>
+                  </Modal.Footer>
+                </Modal>
+              </>
+            )}
+
             {hash && (
-              <div className="d-grid gap-2">
-                <a
-                  className="btn btn-primary mt-3 fs-5 p-2"
-                  size="lg"
-                  href={etherscanURL}
-                  role="button"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  View On Etherscan
-                </a>
-              </div>
+              <>
+                <div className="d-grid gap-2">
+                  <a
+                    className="btn btn-primary mt-3 fs-5 p-2"
+                    size="lg"
+                    href={etherscanURL}
+                    role="button"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    View On Etherscan
+                  </a>
+                </div>
+              </>
             )}
           </main>
         </div>
