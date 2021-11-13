@@ -6,7 +6,7 @@ import copy from "copy-to-clipboard";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
 import { useRecoilValue, useRecoilState } from "recoil";
-import { allWallets, storedWallet, storedAccounts } from "../Recoil/atoms";
+import { allWallets, storedWallet, storedAccounts } from "../recoil/atoms";
 import { NETWORK } from "../config";
 import updateAddressBalances from "../utils/updateAddressBalances";
 import { ethers } from "ethers";
