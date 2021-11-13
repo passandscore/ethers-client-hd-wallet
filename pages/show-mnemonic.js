@@ -1,12 +1,13 @@
 import Head from "next/head";
 import Image from "next/image";
-import { Modal, Button } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 import styles from "../styles/CreateWallet.module.css";
 import { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import copy from "copy-to-clipboard";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
+import jwt from "jsonwebtoken";
 
 export default function ShowMnemonic() {
   const [password, setPassword] = useState("");
@@ -19,27 +20,29 @@ export default function ShowMnemonic() {
 
   useEffect(() => {
     setKeystore(localStorage.getItem("keystore"));
+    setPassword(localStorage.getItem("wallet-pw"));
+
+    jwt.verify(
+      localStorage.getItem("wallet-pw"),
+      "jwtSecret",
+      function (err, decoded) {
+        if (err) {
+          setErrorMsg(err.message);
+        } else {
+          setPassword(decoded.password);
+        }
+      }
+    );
   }, []);
 
   const showMnemonic = async () => {
-    if (!password) {
-      toast.error("Password Required", { theme: "colored" });
-      return;
-    }
-
-    const providedPassword = password;
-
     let wallet;
 
     try {
-      wallet = await ethers.Wallet.fromEncryptedJson(
-        keystore,
-        providedPassword,
-        () => {
-          setIsLoading(true);
-          setTitle("Decrypting Wallet...");
-        }
-      );
+      wallet = await ethers.Wallet.fromEncryptedJson(keystore, password, () => {
+        setIsLoading(true);
+        setTitle("Decrypting Wallet...");
+      });
 
       if (wallet) {
         setIsGenerated(true);
@@ -100,31 +103,23 @@ export default function ShowMnemonic() {
             <h1 className="title display-3 pb-4" style={{ color: "#72C1EA" }}>
               {title}
             </h1>
+
             <div
               className=" pb-4 fs-3 text-center"
               style={{ color: "#F7CD53" }}
             >
               {mnemonic}
             </div>
+
             {mnemonic && (
-              <>
-                <div className="d-flex justified-content-center">
-                  <button
-                    className=" btn btn-light btn-lg p-3 m-3"
-                    style={{ width: "250px" }}
-                    onClick={mnemonicCopiedHandler}
-                  >
-                    Copy Mnemonic
-                  </button>
-                  <button
-                    className=" btn btn-light btn-lg p-3 m-3"
-                    style={{ width: "250px" }}
-                    onClick={saveKeystore}
-                  >
-                    Download Keystore
-                  </button>
-                </div>
-              </>
+              <Button
+                variant="primary"
+                className="mt-3"
+                size="lg"
+                onClick={mnemonicCopiedHandler}
+              >
+                Copy Mnemonic
+              </Button>
             )}
             {isLoading && (
               <div className="flex justify-center mt-20">
@@ -138,17 +133,6 @@ export default function ShowMnemonic() {
             )}
             {!isGenerated && !isLoading && (
               <>
-                <div className="input-group my-4">
-                  <span className="input-group-text">Password</span>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Provide your wallet password."
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                </div>
-
                 <div className="d-grid gap-2">
                   <Button
                     variant="primary"
@@ -156,8 +140,20 @@ export default function ShowMnemonic() {
                     size="lg"
                     onClick={showMnemonic}
                   >
-                    Submit
+                    Reveal Menemonic
                   </Button>
+                  <ul>
+                    <li className=" pt-2" style={{ color: "#F7CD53" }}>
+                      Save your mnemonic phrase in a safe place.
+                    </li>
+                    <li className=" py-2" style={{ color: "#F7CD53" }}>
+                      Never share your mnemonic phrase with anyone.
+                    </li>
+
+                    <li style={{ color: "#F7CD53" }}>
+                      Required to restore your wallet.
+                    </li>
+                  </ul>
                 </div>
               </>
             )}
