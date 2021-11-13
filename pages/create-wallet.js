@@ -33,7 +33,6 @@ export default function CreateWallet() {
   const [updateStoredAccounts, setUpdateStoredAccounts] =
     useRecoilState(storedAccounts);
   const [updateAllWallets, setUpdateAllWallets] = useRecoilState(allWallets);
-  console.log(process.env.NEXT_PUBLIC_INFURA_PROJECT_ID);
   const provider = new ethers.providers.JsonRpcProvider(
     `https://${NETWORK}.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_PROJECT_ID}`
   );
@@ -119,7 +118,6 @@ export default function CreateWallet() {
           localStorage.setItem("wallet-pw", encryptedPassword);
 
           localStorage.setItem("keystore", encryptedWallet);
-          console.log(allWallets);
         }
       }
     } catch (err) {

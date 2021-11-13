@@ -51,6 +51,5 @@ export default async function (provider, wallet, network) {
 
   addresses.total = totalBalance;
   const user = { addresses, derivedWallets };
-  console.log(user);
   return user;
 }
